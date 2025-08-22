@@ -1,36 +1,32 @@
-import express from "express";
-import moment from "moment-timezone";
+import express from 'express';
+import moment from 'moment-timezone';
+import timezones from 'timezones.json'; // Importing the timezones dataset
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Location → Timezone mapping
-const locations = {
-  "sweden": "Europe/Stockholm",
-  "new york": "US/Eastern",
-  "los angeles": "US/Pacific",
-  "london": "Europe/London",
-  "tokyo": "Asia/Tokyo"
-};
-
-app.get("/", (req, res) => {
-  let query = (req.query.q || "").toLowerCase().trim();
+app.get('/', (req, res) => {
+  let query = (req.query.q || '').toLowerCase().trim();
 
   if (!query) {
-    return res.send("Usage: !time LOCATION (example: !time Sweden)");
+    return res.send('Usage: !time LOCATION (e.g., !time Sweden)');
   }
 
-  // Find the first location that starts with the query (partial match)
-  let match = Object.keys(locations).find(
-    loc => loc.toLowerCase().startsWith(query)
-  );
+  // Normalize location names to lowercase
+  const locations = Object.keys(timezones).reduce((acc, country) => {
+    acc[country.toLowerCase()] = timezones[country];
+    return acc;
+  }, {});
+
+  // Find the first location that starts with the query
+  const match = Object.keys(locations).find(loc => loc.startsWith(query));
 
   if (!match) {
-    return res.send("Location not found. Check spelling or try another one!");
+    return res.send('Location not found. Please check your spelling or try another.');
   }
 
-  let timezone = locations[match];
-  let time = moment().tz(timezone).format("HH:mm z");
+  const timezone = locations[match];
+  const time = moment().tz(timezone).format('HH:mm z');
 
   res.send(`Current time in ${match.charAt(0).toUpperCase() + match.slice(1)}: ${time}`);
 });

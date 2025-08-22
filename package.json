@@ -5,6 +5,7 @@
   "type": "module",
   "dependencies": {
     "express": "^4.18.2",
-    "moment-timezone": "^0.6.0"
+    "moment-timezone": "^0.6.0",
+    "timezones.json": "^1.7.2"
   }
 }
